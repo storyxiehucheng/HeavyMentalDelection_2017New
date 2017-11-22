@@ -211,7 +211,7 @@ public class HeavyMentalMainActivity extends Activity {
 	protected void showPopupWindowDialog() {
 		// TODO we can add a new menu here
 		View view = View.inflate(getApplicationContext(), R.layout.dialog_popupwindow_menu, null);
-		PopupWindow popupWindow=new PopupWindow(view,130,120,true);	
+		PopupWindow popupWindow=new PopupWindow(view,130,120,true);
 		popupWindow.showAsDropDown(iv_home_menu, -20, -5);//位置在主按钮的下面
 		//设置进入进出动画
 		//进入动画的标签：android:windowEnterAnimation
@@ -219,8 +219,8 @@ public class HeavyMentalMainActivity extends Activity {
 		popupWindow.setAnimationStyle(R.style.dialog_popupwindow_anim);
 		//对popupWindow进行设置后，需要利用update来更新窗口
 		popupWindow.update();
-		Button bt_dialog_exit= (Button) view.findViewById(R.id.bt_dialog_exit);
-		bt_dialog_exit.setOnClickListener(new OnClickListener() {
+		Button btn_dialog_exit= (Button) view.findViewById(R.id.bt_dialog_exit);
+		btn_dialog_exit.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {

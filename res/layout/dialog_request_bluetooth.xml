@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/warning_background"
+    android:orientation="vertical" >
+    <TextView 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/warning_title"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/warning_contant" />
+
+	<LinearLayout 
+	    android:layout_gravity="center_horizontal"
+	    android:gravity="center_vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+         <Button 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/bt_warning_cancel"
+	        android:layout_marginStart="18dp"
+	        android:gravity="center"
+	        android:background="@drawable/warning_cancel"
+	        />
+	    <Button 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:id="@+id/bt_warning_ok"
+	        android:layout_marginStart="10dp"
+	        android:gravity="center"
+	        android:background="@drawable/warning_ok"
+	        />
+	   
+	</LinearLayout>
+</LinearLayout>

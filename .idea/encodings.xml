@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/Info/BaiduMapInfo.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/Info/HMDataBaseInfo.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/activity/HeavyMentalMainActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/database/DataBaseOpenHepler.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/dbDao/CitiesDao.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/dbDao/HeavyMentalDataBaseDao.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/fragment/FragmentHistory.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/fragment/FragmentHome.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/fragment/MyDialogFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/fragment/MyHandler.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/global/MyApplication.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/manager_user/AchartEngineManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/manager_user/BaiduMapManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/manager_user/MyBluetoothManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/manager_user/SpeechManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/manager_user/TimeManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/my_utils/MyAnimationUtils.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/my_utils/MyConstantValue.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/my_utils/MySortFilterArrayList.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/my_utils/MySpUtils.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/receiver/BluetoothReceiver.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/thread/BluetoothThread.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/view/MyViewShowProcess.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/example/heavymentaldelection/view/myGifView.java" charset="UTF-8" />
+  </component>
+</project>

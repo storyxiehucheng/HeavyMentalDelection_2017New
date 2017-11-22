@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="my_click_background">#F5FFFA</color>
+    <color name="my_process_resetcolor">#FFBFBFBF</color>
+</resources>

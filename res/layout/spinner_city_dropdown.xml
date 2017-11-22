@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/ll_spinner_city_dropdown"
+    android:orientation="horizontal" 
+    android:padding="5dp"
+    android:background="@drawable/spinner_dropdown_click_background"
+    >
+    <TextView 
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_gravity="center_vertical"
+       android:id="@+id/tv_spinner_cityfirst_dropdown"
+       android:text="A"
+       android:textSize="18sp"
+       android:textColor="#FF1493"
+       />
+    <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/tv_spinner_city_dropdown"
+        android:gravity="center"
+        android:text="重庆"
+	    android:textSize="15sp"
+	    android:textColor="#0000FF"
+        />
+
+</LinearLayout>

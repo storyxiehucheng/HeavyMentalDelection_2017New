@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 /**
  * 主要的Activity，主要是蓝牙和网络的检测以及控制fragment的切换等
+ * 作为主要的
  */
 public class HeavyMentalMainActivity extends Activity {
 

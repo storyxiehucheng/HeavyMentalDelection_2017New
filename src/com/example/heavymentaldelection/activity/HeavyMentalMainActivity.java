@@ -40,6 +40,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+/**
+ * 主要的Activity，主要是蓝牙和网络的检测以及控制fragment的切换等
+ */
 public class HeavyMentalMainActivity extends Activity {
 
 	private FragmentManager fragmentManager;//Fragment的管理器

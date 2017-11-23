@@ -24,7 +24,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -166,8 +165,7 @@ public class MyBluetoothManager {
 	private void showListDialog() {
 		LayoutInflater mlayoutInflater=LayoutInflater.from(mContext);
 		View view = mlayoutInflater.inflate( R.layout.dialog_list_bluetooth, null);
-		ListView listview=(ListView)view.findViewById(R.id.lv_dialog_bluetooth);
-		TextView tv_dialog_bluetooth_no=(TextView)view.findViewById(R.id.tv_dialog_bluetooth_no); 
+		ListView listview=(ListView)view.findViewById(R.id.lv_dialog_scan_ble);
 		MyListAdapter myListAdapter=new MyListAdapter();
 		listview.setAdapter(myListAdapter);
 		final Dialog alertBluetoothDialog = new Dialog(mActivity);
@@ -187,15 +185,6 @@ public class MyBluetoothManager {
 				MySpUtils.putString(mContext, MyConstantValue.BLUETOOTH_NAME, bluetoothName);
 				MySpUtils.putBoolean(mContext, MyConstantValue.BLUETOOTH_FIRST_INIT, false);
 				connectBluetoothDevice(mBluetoothDevicesList.get(position));
-				alertBluetoothDialog.dismiss();
-			}
-		});
-		tv_dialog_bluetooth_no.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Message obtainMessage = mHandler.obtainMessage(5);
-				mHandler.sendMessage(obtainMessage);
 				alertBluetoothDialog.dismiss();
 			}
 		});

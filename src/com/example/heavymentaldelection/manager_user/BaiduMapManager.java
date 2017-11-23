@@ -34,7 +34,6 @@ import com.example.heavymentaldelection.Info.BaiduMapInfo;
 import com.example.heavymentaldelection.Info.HMDataBaseInfo;
 import com.example.heavymentaldelection.my_utils.MyConstantValue;
 import com.example.heavymentaldelection.my_utils.MySpUtils;
-
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -123,7 +122,7 @@ public class BaiduMapManager {
 	 */
 	public boolean startLocation()
 	{
-		if(isInitSucceed==false)  return false;
+		if(!isInitSucceed)  return false;
 		//创建LocationClient实例
 		System.out.println("初始化定位");
         locationClient= new LocationClient(mContext);
@@ -160,14 +159,14 @@ public class BaiduMapManager {
 			mBaiduMapInfo.setLongitude(location.getLongitude());
 			mBaiduMapInfo.setAddress(location.getAddrStr());
 			mBaiduMapInfo.setCity(location.getCity());
-            MyLocationData locationdata= new MyLocationData.Builder()
+            MyLocationData locationData= new MyLocationData.Builder()
             .accuracy(location.getRadius())
             .latitude(location.getLatitude())
             .longitude(location.getLongitude())
             .build();
            
            //在BaiduMap中设置定位数据
-            mBaiduMap.setMyLocationData(locationdata);
+            mBaiduMap.setMyLocationData(locationData);
 
             //判断是否第一次定位，如果是执行如下代码
             if(isFirstIn){
@@ -189,11 +188,11 @@ public class BaiduMapManager {
 	/**根据经纬度设置标注，以及点击标注后弹出的窗口信息
 	 * @param latitude  标注点的经度
 	 * @param longitude 标注点纬度
-	 * @param marktext  地图上标注点的的简单提示信息
+	 * @param markText  地图上标注点的的简单提示信息
 	 * @param infoWindowView 弹出信息框的View
 	 * @param myInfoWindowListener 接口对象，用以处理点击信息窗口的处理事件。
 	 */
-	public void setOverMark(HMDataBaseInfo hmDataBaseInfo,double latitude,double longitude,String marktext,final View infoWindowView,
+	public void setOverMark(HMDataBaseInfo hmDataBaseInfo,double latitude,double longitude,String markText,final View infoWindowView,
 			final MyInfoWindowClickListener myInfoWindowListener)
 	   {
 		   mHMDataBaseInfo = hmDataBaseInfo;
@@ -203,7 +202,7 @@ public class BaiduMapManager {
 	            .bgColor(0xAAFFFF00)  
 	            .fontSize(28)  
 	            .fontColor(0xFFFF00FF)  
-	            .text(marktext)  
+	            .text(markText)
 	            .rotate(0)  
 	            .position(Text_position);  
 	        //在地图上添加该文字对象并显示  
@@ -230,7 +229,7 @@ public class BaiduMapManager {
 	        MarkerOptions markOption=new MarkerOptions()
 	        		.position(Text_position)
 	        		.icon(mCurrentMarker)
-	        		.title(marktext)
+	        		.title(markText)
 	        		.period(5)
 	        		.zIndex(2)
 	        		.extraInfo(bundle);
@@ -293,8 +292,8 @@ public class BaiduMapManager {
 	{
 		LatLng latLng = new LatLng(latitude,longitude);
 		OverlayOptions circleOption=new CircleOptions().center(latLng).fillColor(0x9987CEFF).radius(radius).stroke(new Stroke(2, 0xAA436EEE));
-        Overlay circelOverlay = mBaiduMap.addOverlay(circleOption);
-        OverLaylist.add(circelOverlay);
+        Overlay circleOverlay = mBaiduMap.addOverlay(circleOption);
+        OverLaylist.add(circleOverlay);
 	}
 	
 	/**返回一个BaiduMapInfo对象，根据该对象可以获取定位信息
@@ -318,7 +317,7 @@ public class BaiduMapManager {
 	 * 跟随activity的生命周期
 	 * 摧毁百度地图
 	 */
-	public void BaiduMapDestory()
+	public void BaiduMapDestroy()
 	{
 		mMapView.onDestroy();
 	}

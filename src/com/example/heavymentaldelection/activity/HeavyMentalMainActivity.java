@@ -42,7 +42,7 @@ import android.widget.Toast;
 
 /**
  * 主要的Activity，主要是蓝牙和网络的检测以及控制fragment的切换等
- * 作为主要的
+ *
  */
 public class HeavyMentalMainActivity extends Activity {
 
@@ -97,7 +97,8 @@ public class HeavyMentalMainActivity extends Activity {
 			BluetoothAdapter mBluetoothAdapter = bluetoothManager.getAdapter();
 			if(!mBluetoothAdapter.isEnabled())
 			{
-				showRequestDialog();//显示蓝牙请求对话框
+				MyGlobalStaticVar.isBleOpen=false;
+				tv_main_warning.setText(R.string.no_open_ble_warning);
 			}
 			else
 			{
@@ -123,6 +124,7 @@ public class HeavyMentalMainActivity extends Activity {
 						case BluetoothAdapter.STATE_OFF:
 							tv_main_warning.setVisibility(View.VISIBLE);
 							tv_main_warning.setText(R.string.no_open_ble_warning);
+							MyGlobalStaticVar.isBleOpen=false;
 							break;
 						case BluetoothAdapter.STATE_ON:
 							tv_main_warning.setVisibility(View.INVISIBLE);
@@ -130,10 +132,15 @@ public class HeavyMentalMainActivity extends Activity {
 							break;
 					}
 				}
+				if(MyConstantValue.ACTION_SHOULD_OPEN_BLE.equals(action))
+				{
+					showRequestDialog();
+				}
 			}
 		};
 		IntentFilter intentFilter=new IntentFilter();
 		intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		intentFilter.addAction(MyConstantValue.ACTION_SHOULD_OPEN_BLE);
 		registerReceiver(mBluetoothDeviceReceiver,intentFilter);
 	}
 
@@ -364,6 +371,7 @@ public class HeavyMentalMainActivity extends Activity {
 			{
 				tv_main_warning.setVisibility(View.VISIBLE);
 				tv_main_warning.setText(R.string.no_open_ble_warning);
+				MyGlobalStaticVar.isBleOpen=false;
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package com.example.heavymentaldelection.my_utils;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -114,6 +115,7 @@ public class MySpUtils {
 		intentFilter.addAction(BLEService.ACTION_GATT_CHARACTERISTIC_WRITE_SUCCESS);
 		intentFilter.addAction(BLEService.ACTION_GATT_DESCRIPTORWRITE_RESULT);
 		intentFilter.addAction(BLEService.ACTION_RECEIVED_AVAILABLE);
+		intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		return intentFilter;
 	}
 

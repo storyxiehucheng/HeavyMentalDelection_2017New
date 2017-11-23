@@ -333,7 +333,6 @@ public class BLEService extends Service {
         mBluetoothGatt=remoteDevice.connectGatt(context,false,mGattCallback);
         mBluetoothDeviceAddress=address;
         mBluetoothDeviceName=deviceName;
-        mConnectionState=STATE_CONNECTED;
     }
 
     //BLE蓝牙写数据
@@ -358,11 +357,11 @@ public class BLEService extends Service {
      * 断开连接
      */
     public static void disconnect() {
-        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            return;
+        if (mBluetoothAdapter != null && mBluetoothGatt != null)
+        {
+            mConnectionState=STATE_DISCONNECTED;
+            mBluetoothGatt.disconnect();
+            mBluetoothGatt.close();
         }
-        mConnectionState=STATE_DISCONNECTED;
-        mBluetoothGatt.disconnect();
-        mBluetoothGatt.close();
     }
 }

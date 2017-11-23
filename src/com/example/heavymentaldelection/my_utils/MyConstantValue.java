@@ -1,6 +1,8 @@
 package com.example.heavymentaldelection.my_utils;
 
 public class MyConstantValue {
+
+	public static final String ACTION_SHOULD_OPEN_BLE="action_open_ble";
 	/*
 	* Fragment的标记
 	* */
@@ -8,7 +10,7 @@ public class MyConstantValue {
 	public static final String FRAGMENT_HISTORY_TAG="fragmentHistory";
 	public static final String FRAGMENT_TAG="MyApplication";
 	/**
-	 * key：判断蓝牙是否开启
+	 * key：判断蓝牙是否开启的标志位
 	 */
 	public static final String BLUETOOTH_OPEN = "bluetooth_open";
 	/**

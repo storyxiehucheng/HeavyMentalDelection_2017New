@@ -15,21 +15,24 @@
     <TextView 
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#FBFAF0"
+        android:background="#FFFAF0"
         />
-    <ListView
+    <ListView 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv_dialog_scan_ble"
         >
     </ListView>
+    <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CAFF70"
+        />
 	<ProgressBar
 		android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
-		android:layout_height="10dp"
+		android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         style="@android:style/Widget.ProgressBar.Horizontal"
-        android:max="10"
         android:id="@+id/pb_dialog_scan_ble"
 		/>
     <TextView
@@ -39,6 +42,6 @@
         android:text="@string/scan_ble_refresh"
         android:textColor="@android:color/holo_orange_dark"
         android:id="@+id/tv_dialog_scan_ble_refresh"
-        android:visibility="gone"/>
-
+        android:visibility="gone"
+        />
 </LinearLayout>

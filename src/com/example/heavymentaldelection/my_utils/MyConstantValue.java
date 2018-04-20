@@ -1,8 +1,94 @@
 package com.example.heavymentaldelection.my_utils;
 
 public class MyConstantValue {
+	/**
+	 * 标样1000ug的标记
+	 */
+	public static final int SAMPLE_1000 = 1000;
+	/**
+	 * 标样750ug的标记
+	 */
+	public static final int SAMPLE_750 = 750;
+	/**
+	 * 标样600ug的标记
+	 */
+	public static final int SAMPLE_600=600;
+	/**
+	 * 标样500ug的标记
+	 */
+	public static final int SAMPLE_500=500;
+	/**
+	 * 标样400ug的标记
+	 */
+	public static final int SAMPLE_400=400;
+	/**
+	 * 标样250ug的标记
+	 */
+	public static final int SAMPLE_250=250;
+	/**
+	 * 标样200ug的标记
+	 */
+	public static final int SAMPLE_200=200;
+	/**
+	 * 标样125ug的标记
+	 */
+	public static final int SAMPLE_125=125;
+	/**
+	 * 标样100ug的标记
+	 */
+	public static final int SAMPLE_100=100;
+	/**
+	 * 标样75ug的标记
+	 */
+	public static final int SAMPLE_75 = 75;
+	/**
+	 * 标样50ug的标记
+	 */
+	public static final int SAMPLE_50=50;
+	/**
+	 * 标样25ug的标记
+	 */
+	public static final int SAMPLE_25=25;
+	/**
+	 * 标样0ug的标记
+	 */
+	public static final int SAMPLE_0=0;
 
+	/**
+	 * 实际样的标记
+	 */
+	public static final int SAMPLE_ACTUAL=-1;
+
+	/**
+	 * 全部污染的标记
+	 */
+	public static final String ALL_POLLUTION="全部";
+	/**
+	 * 无污染的标记
+	 */
+	public static final String NO_POLLUTION="无污染";
+	/**
+	 * 轻度污染的标记
+	 */
+	public static final String SLIGHT_POLLUTION="轻度污染";
+	/**
+	 * 中度污染的标记
+	 */
+	public static final String MIDDLE_POLLUTION="中度污染";
+	/**
+	 * 中重度污染的标记
+	 */
+	public static final String HIGH_POLLUTION="重度污染";
+
+	/**
+	 * 蓝牙电量，bundle名称
+	 */
+	public static final String BATTERY_LEVEL = "battery_level";
+	/**
+	 * 蓝牙被关闭了的广播action
+	 */
 	public static final String ACTION_SHOULD_OPEN_BLE="action_open_ble";
+	public static final String ACTION_BATTERY="action_battery";
 	/*
 	* Fragment的标记
 	* */
@@ -33,8 +119,17 @@ public class MyConstantValue {
 	 */
 	public static final String NETWORK_AVAILABLE = "network_available";
 
-
-
+	/**
+	 * 蓝牙读写service的UUID
+	 */
+	public static final String USR_SERVICE="0003cdd0-0000-1000-8000-00805f9b0131";
+	public static final String WRITE_DATA_CHARACTERISTIC = "0003cdd2-0000-1000-8000-00805f9b0131";
+	public static final String NOTIFY_DATA_CHARACTERISTIC = "0003cdd1-0000-1000-8000-00805f9b0131";
+	/**
+	 * 蓝牙读取电量的service的UUID
+	 */
+	public static final String BATTERY_SERVICE="0000180f-0000-1000-8000-00805f9b34fb";
+	public static final String BATTERY_CHARACTERISTIC="00002a19-0000-1000-8000-00805f9b34fb";
 	/**
 	 * Extras Constants
 	 */
@@ -225,7 +320,9 @@ public class MyConstantValue {
 	public static final boolean OTA_ENABLED = true;
 	public static final boolean RDK_ENABLED = true;
 	public static final boolean GMS_ENABLED = false;
-	/**
+
+
+    /**
 	 * Fragment Tags
 	 */
 	public static String PROFILE_SCANNING_FRAGMENT_TAG = "BLE Devices";

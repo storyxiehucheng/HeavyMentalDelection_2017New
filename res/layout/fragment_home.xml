@@ -125,7 +125,7 @@
 	         android:layout_centerHorizontal="true"
 	         android:id="@+id/tv_home_countdown"
 	         android:textSize="16sp"
-	         android:text="显示计数"
+	         android:text="检测状态显示"
 	         />
 	     <Button 
 	         android:layout_width="wrap_content"
@@ -139,17 +139,20 @@
 	         android:text="结束\n富集"
 	         android:background="@drawable/bt_end_accumlation"
 	         android:visibility="gone"
-	         />	     
+	         />
+
+		<!--显示提示内容-->
 	     <TextView 
-	         android:layout_width="wrap_content"
+	         android:layout_width="match_parent"
 	         android:layout_height="wrap_content"
 	         android:layout_centerHorizontal="true"
 	         android:id="@+id/tv_home_delection_hint"
 	         android:textSize="13sp"
 	         android:layout_marginTop="5dp"
+			 android:layout_marginStart="20dp"
 	         android:layout_below="@id/tv_home_countdown"
-	         android:text="显示提示内容"
-	         />	
+			 />
+
 	    <LinearLayout 
 	         android:layout_width="match_parent"
 	         android:layout_height="70dp"
@@ -162,6 +165,7 @@
 	             android:layout_height="wrap_content"
 	             android:id="@+id/showprocess_start"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	         <ImageView 
 	             android:layout_height="wrap_content"
@@ -169,12 +173,14 @@
 	             android:layout_gravity="center_vertical"
 	             android:id="@+id/iv_showprocess_start_to_accumlation"
 	             android:src="@drawable/process_disconnect"
+				 android:visibility="gone"
 	             />
 	         <com.example.heavymentaldelection.view.MyViewShowProcess
 	             android:layout_width="wrap_content"
 	             android:layout_height="wrap_content"
 	             android:id="@+id/showprocess_accumlation"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	         <ImageView 
 	             android:layout_height="wrap_content"
@@ -182,12 +188,14 @@
 	             android:id="@+id/iv_showprocess_accumlation_to_delection"
 	             android:src="@drawable/process_disconnect"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	         <com.example.heavymentaldelection.view.MyViewShowProcess
 	             android:layout_width="wrap_content"
 	             android:layout_height="wrap_content"
 	             android:id="@+id/showprocess_delection"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	         <ImageView 
 	             android:layout_height="wrap_content"
@@ -195,12 +203,14 @@
 	             android:id="@+id/iv_showprocess_delection_to_end"
 	             android:src="@drawable/process_disconnect"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	         <com.example.heavymentaldelection.view.MyViewShowProcess
 	             android:layout_width="wrap_content"
 	             android:layout_height="wrap_content"
 	             android:id="@+id/showprocess_end"
 	             android:layout_gravity="center_vertical"
+				 android:visibility="gone"
 	             />
 	     </LinearLayout>    
          <LinearLayout 
@@ -225,7 +235,7 @@
 		         android:layout_height="wrap_content"
 		         android:id="@+id/bt_home_accumulation"
 		         android:drawableTop="@drawable/bt_home_accumlation"
-		         android:text="开始富集"
+		         android:text="开始标定"
 		         android:background="@null"
 		         android:gravity="center"
 		         android:layout_gravity="center_vertical"
@@ -250,12 +260,11 @@
 	         android:id="@+id/iv_home_pick_bluetooth"
 	         android:layout_width="30dp"
 	         android:layout_height="30dp"
-	         android:layout_below="@+id/tv_home_countdown"
 	         android:layout_marginEnd="8dp"
 	         android:layout_marginStart="10dp"
-	         android:layout_toEndOf="@id/tv_home_delection_hint"
+	         android:layout_toEndOf="@id/tv_home_countdown"
 	         android:background="@drawable/click_bluetooth"
-	         android:visibility="gone" />
+	         android:visibility="visible" />
 
 	 </RelativeLayout>
 </LinearLayout>

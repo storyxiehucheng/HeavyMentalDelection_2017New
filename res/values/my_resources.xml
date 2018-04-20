@@ -2,4 +2,8 @@
 <resources>
     <color name="my_click_background">#F5FFFA</color>
     <color name="my_process_resetColor">#FFBFBFBF</color>
+    <color name="my_slight_pollution">#FF8E8E38</color>
+    <color name="my_middle_pollution">#FF8B4726</color>
+    <color name="my_high_pollution">#FF8B0000</color>
+    <color name="my_no_pollution">#FF43CD80</color>
 </resources>

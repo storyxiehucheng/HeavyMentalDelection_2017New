@@ -116,6 +116,9 @@ public class MySpUtils {
 		intentFilter.addAction(BLEService.ACTION_GATT_DESCRIPTORWRITE_RESULT);
 		intentFilter.addAction(BLEService.ACTION_RECEIVED_AVAILABLE);
 		intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+		intentFilter.addAction(BLEService.ACTION_COMMAND_RECEIVE_OK);
+		intentFilter.addAction(BLEService.ACTION_PRE_PROCESSING_RECEIVE_OK);
+		intentFilter.addAction(BLEService.ACTION_HEART_DETECTED_RECEIVE_OK);
 		return intentFilter;
 	}
 

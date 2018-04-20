@@ -29,6 +29,7 @@ import com.baidu.mapapi.map.BaiduMap.OnMapClickListener;
 import com.baidu.mapapi.map.BaiduMap.OnMarkerClickListener;
 import com.baidu.mapapi.map.InfoWindow.OnInfoWindowClickListener;
 import com.baidu.mapapi.model.LatLng;
+import com.example.heavymentaldelection.Info.HeavyMentalDataInfo;
 import com.example.heavymentaldelection.R;
 import com.example.heavymentaldelection.Info.BaiduMapInfo;
 import com.example.heavymentaldelection.Info.HMDataBaseInfo;
@@ -37,6 +38,7 @@ import com.example.heavymentaldelection.my_utils.MySpUtils;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +57,7 @@ public class BaiduMapManager {
 	private BaiduMapInfo mBaiduMapInfo=new BaiduMapInfo();
 	private BitmapDescriptor mCurrentMarker;
 	private boolean isFirstIn=true;
-	private HMDataBaseInfo mHMDataBaseInfo;
+	private HeavyMentalDataInfo mHMDataBaseInfo;
 	private ArrayList<Overlay> OverLaylist=new ArrayList<Overlay>();
 	public BaiduMapManager(MapView mapView, Context mContext) {
 		this.mMapView = mapView;
@@ -76,7 +78,6 @@ public class BaiduMapManager {
 			
 			@Override
 			public boolean onMapPoiClick(MapPoi arg0) {
-				// TODO Auto-generated method stub
 				return false;
 			}
 			
@@ -141,7 +142,7 @@ public class BaiduMapManager {
         option.setLocationMode(LocationMode.Hight_Accuracy);// 设置为高精度定位模式（GPS和网络同时定位，返回精度高的定位结果）
         locationClient.setLocOption(option);// 使用设置
         System.out.println("设置完成");
-        //启动LocationClient开始定位,定位结果返回在监听器的onReceiveLocation中        
+        //启动LocationClient开始定位,定位结果返回在监听器的onReceiveLocation中
         locationClient.start();
         System.out.println("开启定位");
 		return true;			
@@ -177,10 +178,10 @@ public class BaiduMapManager {
                          "地址是："+ location.getAddrStr()+"\n"                       
                           +"定位精度是："+location.getRadius()+"\n"
                           ,Toast.LENGTH_LONG).show();           
-                System.out.println("Address:-------"+String.valueOf(location.getCity()));
-                System.out.println("District:------"+String.valueOf(location.getAddrStr()));
-                System.out.println("getLatitude:------"+String.valueOf(location.getLatitude()));                    
-                System.out.println("getLongitude:------"+String.valueOf(location.getLongitude()));                    
+				Log.e("story","Address:-------"+String.valueOf(location.getCity()));
+				Log.e("story","District:------"+String.valueOf(location.getAddrStr()));
+				Log.e("story","getLatitude:------"+String.valueOf(location.getLatitude()));
+				Log.e("story","getLongitude:------"+String.valueOf(location.getLongitude()));
               }
            }           
 		}
@@ -192,8 +193,8 @@ public class BaiduMapManager {
 	 * @param infoWindowView 弹出信息框的View
 	 * @param myInfoWindowListener 接口对象，用以处理点击信息窗口的处理事件。
 	 */
-	public void setOverMark(HMDataBaseInfo hmDataBaseInfo,double latitude,double longitude,String markText,final View infoWindowView,
-			final MyInfoWindowClickListener myInfoWindowListener)
+	public void setOverMark(HeavyMentalDataInfo hmDataBaseInfo, double latitude, double longitude, String markText, final View infoWindowView,
+							final MyInfoWindowClickListener myInfoWindowListener)
 	   {
 		   mHMDataBaseInfo = hmDataBaseInfo;
 	       LatLng Text_position = new LatLng(latitude, longitude);  	        
@@ -225,7 +226,7 @@ public class BaiduMapManager {
 				break;
 			}
 	        Bundle bundle = new Bundle();
-	        bundle.putString("details", hmDataBaseInfo.getDetails());
+	        bundle.putString("details", hmDataBaseInfo.getDetail());
 	        MarkerOptions markOption=new MarkerOptions()
 	        		.position(Text_position)
 	        		.icon(mCurrentMarker)

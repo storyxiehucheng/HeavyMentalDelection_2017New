@@ -5,13 +5,14 @@ import com.example.heavymentaldelection.R;
 import com.example.heavymentaldelection.fragment.FragmentHistory;
 import com.example.heavymentaldelection.fragment.FragmentHome;
 import com.example.heavymentaldelection.manager_user.BLEManager;
+import com.example.heavymentaldelection.manager_user.SpeechManager;
 import com.example.heavymentaldelection.my_utils.MyConstantValue;
-import com.example.heavymentaldelection.my_utils.MyGlobalStaticVar;
+import com.example.heavymentaldelection.global.MyGlobalStaticVar;
 import com.example.heavymentaldelection.my_utils.MySpUtils;
-import com.example.heavymentaldelection.receiver.BluetoothReceiver;
 import com.example.heavymentaldelection.service.BLEService;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -27,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,7 +39,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 
 
 /**
@@ -48,10 +51,12 @@ public class HeavyMentalMainActivity extends Activity {
 
 	private FragmentManager fragmentManager;//Fragment的管理器
 	private FragmentTransaction beginTransaction;//fragment的事务管理，fragment的主要操作在这里面完成
-	private ImageView iv_home_menu;//总体界面右上角菜单按钮
-	private TextView tv_main_warning;//总体界面的温馨提示语句
+	private ImageView mIv_home_menu;//总体界面右上角菜单按钮
+	private TextView mTv_main_warning;//总体界面的温馨提示语句
 	private BroadcastReceiver mBluetoothDeviceReceiver; //创建一个蓝牙receiver来监听蓝牙开关状态
+	private ImageView mIv_main_battery;//电池电量图标
 
+    private ArrayList<Integer> tempBatteryList=new ArrayList<>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +65,8 @@ public class HeavyMentalMainActivity extends Activity {
 		//初始化百度地图
 		SDKInitializer.initialize(getApplicationContext());
 		// TODO: 2017/11/20  IFLYTEK voice prompt initialization operation
-//		//科大讯飞语音初始化
-//		SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID +"=5937a285,"+ SpeechConstant.FORCE_LOGIN +"=true");
+		//科大讯飞语音初始化
+		SpeechUtility.createUtility(getApplicationContext(), SpeechConstant.APPID +"=5a6d80c4,"+ SpeechConstant.FORCE_LOGIN +"=true");
 
 		//初始化布局文件
 	    setContentView(R.layout.activity_heavy_mental_main);
@@ -89,7 +94,7 @@ public class HeavyMentalMainActivity extends Activity {
 		//检查设备是否支持BLE蓝牙，如果不支持,则提示用户，无法连接检测设备
 		if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE))
 		{
-			tv_main_warning.setText(R.string.no_ble_warning);
+			mTv_main_warning.setText(R.string.no_ble_warning);
 		}
 		else//如果支持BLE蓝牙，则检查是否打开蓝牙，如果没有这提示用户打开蓝牙
 		{
@@ -98,7 +103,7 @@ public class HeavyMentalMainActivity extends Activity {
 			if(!mBluetoothAdapter.isEnabled())
 			{
 				MyGlobalStaticVar.isBleOpen=false;
-				tv_main_warning.setText(R.string.no_open_ble_warning);
+				mTv_main_warning.setText(R.string.no_open_ble_warning);
 			}
 			else
 			{
@@ -122,12 +127,12 @@ public class HeavyMentalMainActivity extends Activity {
 					switch(state)
 					{
 						case BluetoothAdapter.STATE_OFF:
-							tv_main_warning.setVisibility(View.VISIBLE);
-							tv_main_warning.setText(R.string.no_open_ble_warning);
+							mTv_main_warning.setVisibility(View.VISIBLE);
+							mTv_main_warning.setText(R.string.no_open_ble_warning);
 							MyGlobalStaticVar.isBleOpen=false;
 							break;
 						case BluetoothAdapter.STATE_ON:
-							tv_main_warning.setVisibility(View.INVISIBLE);
+							mTv_main_warning.setVisibility(View.INVISIBLE);
 							MyGlobalStaticVar.isBleOpen=true;
 							break;
 					}
@@ -136,11 +141,53 @@ public class HeavyMentalMainActivity extends Activity {
 				{
 					showRequestDialog();
 				}
+				if(MyConstantValue.ACTION_BATTERY.equals(action))
+				{
+					int battery_level=intent.getIntExtra(MyConstantValue.BATTERY_LEVEL,100);
+                    tempBatteryList.add(battery_level);
+					mTv_main_warning.setVisibility(View.VISIBLE);
+					mTv_main_warning.setText("电量为："+battery_level);
+
+					if(battery_level>90)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_100_48px));
+					}
+					else if(battery_level>70 && battery_level<=90)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_80_48px));
+					}
+					else if(battery_level>60 && battery_level<=70)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_60_48px));
+					}
+					else if(battery_level>50 && battery_level<=60)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_50_48px));
+					}
+					else if(battery_level>40 && battery_level<=50)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_30_48px));
+					}
+					else if(battery_level>30 && battery_level<=40)
+					{
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_10_48px));
+					}
+					else
+					{
+						mTv_main_warning.setText("检测设备电量过低，请及时充电");
+						mIv_main_battery.setBackground(getDrawable(R.drawable.battery_0_alert_48px));
+						SpeechManager speechManager = new SpeechManager(getApplicationContext());
+						speechManager.setSpeechString("检测设备电量低，请及时充电");
+					}
+//					Log.e("story","电池数据为："+tempBatteryList.size());
+//                    Log.e("story","电池电量为："+tempBatteryList);
+				}
 			}
 		};
 		IntentFilter intentFilter=new IntentFilter();
 		intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
 		intentFilter.addAction(MyConstantValue.ACTION_SHOULD_OPEN_BLE);
+		intentFilter.addAction(MyConstantValue.ACTION_BATTERY);
 		registerReceiver(mBluetoothDeviceReceiver,intentFilter);
 	}
 
@@ -195,8 +242,8 @@ public class HeavyMentalMainActivity extends Activity {
 		bt_warning_cancel.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				tv_main_warning.setVisibility(View.VISIBLE);
-				tv_main_warning.setText(R.string.no_open_ble_warning);
+				mTv_main_warning.setVisibility(View.VISIBLE);
+				mTv_main_warning.setText(R.string.no_open_ble_warning);
 				requestBluetoothDialog.dismiss();
 			}
 		});		
@@ -206,8 +253,8 @@ public class HeavyMentalMainActivity extends Activity {
 	 * 退出主程序，并且关闭线程
 	 */
 	private void MyMenu() {
-		iv_home_menu = (ImageView) findViewById(R.id.iv_home_menu);
-		iv_home_menu.setOnClickListener(new OnClickListener() {
+		mIv_home_menu = (ImageView) findViewById(R.id.iv_home_menu);
+		mIv_home_menu.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -223,7 +270,7 @@ public class HeavyMentalMainActivity extends Activity {
 		// TODO we can add a new menu here
 		View view = View.inflate(getApplicationContext(), R.layout.dialog_popupwindow_menu, null);
 		PopupWindow popupWindow=new PopupWindow(view,130,120,true);
-		popupWindow.showAsDropDown(iv_home_menu, -20, -5);//位置在主按钮的下面
+		popupWindow.showAsDropDown(mIv_home_menu, -20, -5);//位置在主按钮的下面
 		//设置进入进出动画
 		//进入动画的标签：android:windowEnterAnimation
 		//退出动画的标签：android:windowExitAnimation
@@ -249,7 +296,9 @@ public class HeavyMentalMainActivity extends Activity {
 		final FragmentHome fragmentHome = new FragmentHome();
 		final FragmentHistory fragmentHistory = new FragmentHistory();
 
-		tv_main_warning = (TextView) findViewById(R.id.tv_main_warning);
+		mTv_main_warning = (TextView) findViewById(R.id.tv_main_warning);
+
+		mIv_main_battery=(ImageView)findViewById(R.id.iv_main_battery);
 		final Button btn_home_home=(Button)findViewById(R.id.bt_home_home);
 		final Button btn_home_history=(Button)findViewById(R.id.bt_home_history);
 
@@ -281,10 +330,10 @@ public class HeavyMentalMainActivity extends Activity {
 				showFragment(MyConstantValue.FRAGMENT_HISTORY_TAG);
 			}
 		});
-		tv_main_warning.setOnClickListener(new OnClickListener() {
+		mTv_main_warning.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(tv_main_warning.getText().toString().contains("点击跳转到蓝牙设置"))
+				if(mTv_main_warning.getText().toString().contains("点击跳转到蓝牙设置"))
 				{
 					Intent intent=new Intent(Settings.ACTION_BLUETOOTH_SETTINGS);
 					startActivity(intent);
@@ -369,8 +418,8 @@ public class HeavyMentalMainActivity extends Activity {
 			}
 			else
 			{
-				tv_main_warning.setVisibility(View.VISIBLE);
-				tv_main_warning.setText(R.string.no_open_ble_warning);
+				mTv_main_warning.setVisibility(View.VISIBLE);
+				mTv_main_warning.setText(R.string.no_open_ble_warning);
 				MyGlobalStaticVar.isBleOpen=false;
 			}
 		}

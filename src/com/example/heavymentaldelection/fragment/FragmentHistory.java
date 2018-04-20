@@ -1,16 +1,23 @@
 package com.example.heavymentaldelection.fragment;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.Marker;
-import com.example.heavymentaldelection.R;
-import com.example.heavymentaldelection.Info.HMDataBaseInfo;
+import com.example.heavymentaldelection.Info.HeavyMentalDataInfo;
 import com.example.heavymentaldelection.dbDao.CitiesDao;
-import com.example.heavymentaldelection.dbDao.HeavyMentalDataBaseDao;
 import com.example.heavymentaldelection.manager_user.BaiduMapManager;
+import com.example.heavymentaldelection.my_utils.HttpUtils;
+import com.example.heavymentaldelection.my_utils.MyConstantValue;
 import com.example.heavymentaldelection.my_utils.MySortFilterArrayList;
+import com.example.heavymentaldelection.my_utils.MyUsingUtils;
+import com.example.heavymentaldelection.my_utils.QueryFromNet;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.example.heavymentaldelection.R;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -27,7 +34,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -43,28 +49,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class FragmentHistory extends Fragment {
-	private static final String TABLE_NAME="heavymental01";
-	private View historyView;
+	private static final String TABLE_NAME="heavyMental01";
+	private View mHistoryView;
 	private Spinner sp_history_pollution;
 	private Context mContext;
 	private TextView tv_history_choice_date;
 	private Spinner sp_history_choice_city;
-	private ArrayList<String> citieslist;
-	private ListView lv_history_listview;
-	private HeavyMentalDataBaseDao heavyMentalDataBaseDao;
+	private ListView lv_history_listView;
 	private Handler mHandler;
 	private MyListViewAdapter myListViewAdapter;
-	private ArrayList<HMDataBaseInfo> hMDataBaseInfoList;
-	private ArrayList<HMDataBaseInfo> hMDataBaseInfoListAll;
+	private ArrayList<HeavyMentalDataInfo> mHMInfoList=new ArrayList<>();
 	private TextView tv_history_time_order;
 	private TextView tv_history_pollution_order;
 	private MapView historyMapView;
 	private BaiduMapManager hBaiduMapManager;
+	private Gson mGson=new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+	private ArrayList<HeavyMentalDataInfo> mHMInfoListAll;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		historyView = inflater.inflate(R.layout.fragment_history, container, false);
+		mHistoryView = inflater.inflate(R.layout.fragment_history, container, false);
 		initId();
-		return historyView;
+		return mHistoryView;
 	}
 	@SuppressLint("HandlerLeak")
 	@Override
@@ -86,7 +91,7 @@ public class FragmentHistory extends Fragment {
 				case 0:
 						filterListData();
 					break;
-				case 1:
+				case 1://按时间排序
 					 tv_history_pollution_order.setText("污染：默认");
 					 drawable = mContext.getDrawable(R.drawable.history_order_admin);
 					 drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
@@ -95,11 +100,11 @@ public class FragmentHistory extends Fragment {
 					 sortPollution=tv_history_pollution_order.getText().toString();
 					 
 					 filterListData();
-					 hMDataBaseInfoList=MySortFilterArrayList.sortList(sortDate, hMDataBaseInfoList);
+					 mHMInfoList=MySortFilterArrayList.sortList(sortDate, mHMInfoList);
 					 updateListAdapter();
 					
 					break;
-				case 2:
+				case 2://按污染程度排序
 					tv_history_time_order.setText("时间：默认");
 					drawable = mContext.getDrawable(R.drawable.history_order_admin);
 					drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
@@ -107,18 +112,22 @@ public class FragmentHistory extends Fragment {
 					sortPollution=tv_history_pollution_order.getText().toString();
 					
 					filterListData();
-					hMDataBaseInfoList=MySortFilterArrayList.sortList(sortPollution, hMDataBaseInfoList);
+					mHMInfoList=MySortFilterArrayList.sortList(sortPollution, mHMInfoList);
 					updateListAdapter();
 					break;
 				case 3:
-					 HMDataBaseInfo hmDataBaseInfo= (HMDataBaseInfo) msg.obj;
+					 HeavyMentalDataInfo hmDataBaseInfo= (HeavyMentalDataInfo) msg.obj;
 					 Message obtainMessage = mHandler.obtainMessage(3, hmDataBaseInfo);
 					 hBaiduMapManager.clearCircelOvrelay();
 					 hBaiduMapManager.setCircleOverlay(hmDataBaseInfo.getLatitude(), hmDataBaseInfo.getLongitude(), time*60);
 					 time++;
 					 if(time==10) time=0;
 					 mHandler.sendMessageDelayed(obtainMessage, 120);
-					break;
+					 break;
+
+					case 4://获取数据成功的返回值，更新数据显示
+						updateListAdapter();
+						break;
 				default:
 					break;
 				}
@@ -127,11 +136,11 @@ public class FragmentHistory extends Fragment {
 			 * 更新数据适配器
 			 */
 			private void updateListAdapter() {
-			 showMarkerAll(hMDataBaseInfoList);
+			 showMarkerAll(mHMInfoList);
 			 if(myListViewAdapter==null)
 			   {
 				   myListViewAdapter = new MyListViewAdapter();
-				   lv_history_listview.setAdapter(myListViewAdapter);
+				   lv_history_listView.setAdapter(myListViewAdapter);
 			   }
 			   else
 			   {
@@ -141,12 +150,12 @@ public class FragmentHistory extends Fragment {
 			/**
 			 * 按条件过滤检测数据
 			 */
-			protected void filterListData() {
+			void filterListData() {
 				filterDate=tv_history_choice_date.getText().toString();
 				filterCity=(String) sp_history_choice_city.getSelectedItem();
 				filterCity=filterCity.substring(1, filterCity.length());
 				filterPollution=(String) sp_history_pollution.getSelectedItem();
-				hMDataBaseInfoList=MySortFilterArrayList.filterProcess(filterDate,filterCity, filterPollution,hMDataBaseInfoListAll);
+				mHMInfoList=MySortFilterArrayList.filterProcess(filterDate,filterCity, filterPollution,mHMInfoListAll);
 				updateListAdapter();
 			}
 			
@@ -159,29 +168,30 @@ public class FragmentHistory extends Fragment {
 	/**动态显示地图的圆形动画。
 	 * @param hmDataBaseInfo
 	 */
-	protected void setCircleAnimation(HMDataBaseInfo hmDataBaseInfo) {
+	protected void setCircleAnimation(HeavyMentalDataInfo hmDataBaseInfo) {
 		
 	}
 	/**在地图上显示listview中对应的标记
 	 * @param hMDataBaseInfoList2
 	 */
-	protected void showMarkerAll(ArrayList<HMDataBaseInfo> hMDataBaseInfoList2) {
-		View markreView=View.inflate(mContext, R.layout.history_map_marker, null);
-		TextView tv_history_map_marker=(TextView) markreView.findViewById(R.id.tv_history_map_marker);
+	protected void showMarkerAll(ArrayList<HeavyMentalDataInfo> hMDataBaseInfoList2) {
+		View markerView=View.inflate(mContext, R.layout.history_map_marker, null);
+		TextView tv_history_map_marker=(TextView) markerView.findViewById(R.id.tv_history_map_marker);
 		//停止发送Message（3），即停止circle overlay 动画
 		mHandler.removeMessages(3);
 		//先清除地图上的所有覆盖物
 		hBaiduMapManager.clearMapOverLay();
-		if(hMDataBaseInfoList2.isEmpty())
+		if(hMDataBaseInfoList2==null || hMDataBaseInfoList2.isEmpty())
 		{
+			Log.e("story","hMDataBaseInfoList2的数据为null");
 			return;
 		}
 		//根据列表中的数据，对应在地图上显示标注
-		for (HMDataBaseInfo hmDataBaseInfo : hMDataBaseInfoList2) {
-			tv_history_map_marker.setText(hmDataBaseInfo.getDetails());
+		for (HeavyMentalDataInfo hmDataBaseInfo : hMDataBaseInfoList2) {
+			tv_history_map_marker.setText(hmDataBaseInfo.getDetail());
 			hBaiduMapManager.setOverMark(hmDataBaseInfo,hmDataBaseInfo.getLatitude(),
 					hmDataBaseInfo.getLongitude(),
-					hmDataBaseInfo.getCity(), markreView, new BaiduMapManager.MyInfoWindowClickListener() {
+					hmDataBaseInfo.getCity(), markerView, new BaiduMapManager.MyInfoWindowClickListener() {
 						@Override
 						public void MyBaiduInfoWindowClickListener(BaiduMap baidumap, Marker marker) {
 							baidumap.hideInfoWindow();
@@ -195,20 +205,34 @@ public class FragmentHistory extends Fragment {
 	 */
 	private void initData() {
 		initBaiduMap();
+		getAllDateFromNetServer();//从服务器上获取最新的数据
 		//污染情况的spinner的处理
-		String[] spinner_text_pollution=new String[]{"全部","无污染","轻度污染","中度污染","重度污染"};
-		ArrayAdapter<String> adapter=new ArrayAdapter<String>(mContext,R.layout.spinner_text_style ,spinner_text_pollution);
+		String[] spinner_text_pollution=new String[]{
+				MyConstantValue.ALL_POLLUTION,
+				MyConstantValue.NO_POLLUTION,
+				MyConstantValue.SLIGHT_POLLUTION,
+				MyConstantValue.MIDDLE_POLLUTION,
+				MyConstantValue.HIGH_POLLUTION};
+		ArrayAdapter<String> adapter=new ArrayAdapter<>(mContext,R.layout.spinner_text_style ,spinner_text_pollution);
 		adapter.setDropDownViewResource(R.layout.spinner_dropdown_text_style);
 		sp_history_pollution.setAdapter(adapter);
+
+		//spinner下拉选项会默认执行一次，第一个触发选项的触发，这里需要将第一次的触发关闭
+		sp_history_pollution.setSelection(0,false);
+
 		sp_history_pollution.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+			{
+				Log.e("story","sp_history_pollution选择的：position="+position+" id="+id);
+				//发送消息，显示过滤信息
 				mHandler.sendEmptyMessage(0);
 			}
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
+
 		//时间选择对话框的处理
 		tv_history_choice_date.setOnClickListener(new OnClickListener() {
 			
@@ -217,44 +241,31 @@ public class FragmentHistory extends Fragment {
 				showDateDialog();
 			}
 		});
+
 		//地点的spinner的处理
 		CitiesDao citiesDao = new CitiesDao(mContext);
-		citieslist = citiesDao.getCities();
-		citieslist.add(0, " 全部");
-		String[] spinner_text_address=new String[citieslist.size()];
-		for(int i=0;i<citieslist.size();i++)
+		ArrayList<String> mCitiesList = citiesDao.getCities();
+		mCitiesList.add(0, " 全部");
+		CitiesAdapter citiesAdapter = new CitiesAdapter(mContext, R.layout.spinner_text_style, mCitiesList);
+		sp_history_choice_city.setAdapter(citiesAdapter);
+		//spinner下拉选项会默认执行一次，第一个触发选项的触发，这里需要将第一次的触发关闭
+		sp_history_choice_city.setSelection(0,false);
+
+		sp_history_choice_city.setOnItemSelectedListener(new OnItemSelectedListener()
 		{
-			spinner_text_address[i]=citieslist.get(i);
-		}
-		CitiessAdapter citiessAdapter = new CitiessAdapter(mContext, R.layout.spinner_text_style, citieslist);
-		sp_history_choice_city.setAdapter(citiessAdapter);
-		sp_history_choice_city.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				mHandler.sendEmptyMessage(0);
+				Log.e("story","sp_history_choice_city选择的：position="+position+" id="+id);
+				mHandler.sendEmptyMessage(0);//发送到handler，进行统一过滤处理
 			}
-
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
 				Log.e("story", "-----触发了onNothingSelected监听器");
 			}
 		});
-		
+
 		//listView的处理
-		HeavyMentalDataBaseDao hMDataBaseDao = HeavyMentalDataBaseDao.getInstance(mContext,TABLE_NAME); 
-		int count = hMDataBaseDao.getCount();
-		Log.e("myBluetooth", "---------总共查询到的数据数为："+count);
-		heavyMentalDataBaseDao = HeavyMentalDataBaseDao.getInstance(mContext,TABLE_NAME);
-		hMDataBaseDao.deleteAll();
-//		heavyMentalDataBaseDao.insert("2017-04-11", "长沙市", "长沙市海淀区", "中度污染", "长沙的测试数据",39.9942,  116.343315);
-//		heavyMentalDataBaseDao.insert("2017-06-29", "武汉市", "武汉市港口区", "轻度污染",  "武汉的测试数据",39.9842,  116.353315);
-//		heavyMentalDataBaseDao.insert("2017-10-19", "桂林市", "桂林市山水区", "无污染", "桂林的测试数据",39.9742,  116.323315);
-//		heavyMentalDataBaseDao.insert("2017-08-14", "成都市", "成都市武侯祠区", "中度污染", "成都的测试数据",39.9642,  116.363315);
-		heavyMentalDataBaseDao.insert("2017-01-20", "北京市", "北京市海淀区", "轻度污染", "北京的测试数据",39.99470,  116.3332933);
-		getDataBaseData();
-		
-		
-		lv_history_listview.setOnItemClickListener(new OnItemClickListener() {
+		lv_history_listView.setOnItemClickListener(new OnItemClickListener() {
 			//记录ID号，以便判断再次点击的是否是同一个ID，
 			private int showId=-1;
 			//判断是否显示的标志
@@ -265,10 +276,8 @@ public class FragmentHistory extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				TextView tv_history_item_details=(TextView) view.findViewById(R.id.tv_history_item_details);
 				ImageView iv_history_item_arrow=(ImageView) view.findViewById(R.id.iv_history_item_arrow);
-				//判断textview是否已经显示,未显示则将标志位设置为false
-				if(!tv_history_item_details.isShown())    isShow=false;
-				//如果已经显示则，标志位TRUE
-				else    isShow=true;
+				//判断textView是否已经显示,未显示则将标志位设置为false
+				isShow = tv_history_item_details.isShown();
 				//判断是否同一个ID，如果不是则保存该ID，并设置previousView为现在的TextView	
 				if(showId!=position)
 				{
@@ -284,7 +293,7 @@ public class FragmentHistory extends Fragment {
 						previousView.setVisibility(View.GONE);
 						previousView=tv_history_item_details;
 					}
-					tv_history_item_details.setText(hMDataBaseInfoList.get(position).getDetails());
+					tv_history_item_details.setText(mHMInfoList.get(position).getDetail());
 				}
 				if(isShow)
 				{
@@ -297,8 +306,10 @@ public class FragmentHistory extends Fragment {
 					isShow=true;
 					tv_history_item_details.setVisibility(View.VISIBLE);
 					iv_history_item_arrow.setBackgroundResource(R.drawable.history_item_arrow_detail_up);
-				}				
-				HMDataBaseInfo hmDataBaseInfo = hMDataBaseInfoList.get(position);
+				}
+
+				//地图上显示相应的信息
+				HeavyMentalDataInfo hmDataBaseInfo = mHMInfoList.get(position);
 				hBaiduMapManager.setNewCenter(hmDataBaseInfo.getLatitude(), hmDataBaseInfo.getLongitude(), 15f);
 				mHandler.removeMessages(3);
 				Message message=new Message();
@@ -307,6 +318,7 @@ public class FragmentHistory extends Fragment {
 				mHandler.sendMessage(message);
 			}
 		});
+
 		//时间排序的处理
 		tv_history_time_order.setOnClickListener(new OnClickListener() {
 			private int order=1;
@@ -386,14 +398,57 @@ public class FragmentHistory extends Fragment {
 			}
 		});
 	}
+
+	/**
+	 * 开启一个线程来从网络上获取服务器中的数据
+	 */
+	private void getAllDateFromNetServer() {
+		Thread thread=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String queryAllStr = QueryFromNet.queryAll();
+				if(!queryAllStr.equals(HttpUtils.URL_ERROR)  && !queryAllStr.equals(HttpUtils.NET_ERROR))
+				{
+					if(!queryAllStr.equals(HttpUtils.PARAMETR_ERROR))
+					{
+						Type type=new TypeToken<ArrayList<HeavyMentalDataInfo>>(){}.getType();
+						ArrayList<HeavyMentalDataInfo> tempList=mGson.fromJson(queryAllStr,type);
+						if(tempList!=null)
+						{
+							mHMInfoList=tempList;
+							Log.e("story","接收到的mHMInfoList数据为："+mHMInfoList);
+							mHMInfoListAll=mHMInfoList;
+							mHandler.sendEmptyMessage(4);
+						}
+						else
+						{
+							Log.e("story","gson转换的数据有误");
+						}
+
+					}
+					else
+					{
+						Log.e("story","从服务器获取数据失败-----请求参数错误");
+					}
+
+				}
+				else
+				{
+					Log.e("story","从服务器获取数据失败------网络连接失败");
+				}
+			}
+		});
+		thread.start();
+
+	}
+
 	/**
 	 * 初始化百度地图
 	 */
 	private void initBaiduMap() {
-		// TODO Auto-generated method stub
 		hBaiduMapManager=new BaiduMapManager(historyMapView, mContext);
-		hBaiduMapManager.InitMapView();
-		
+		boolean b = hBaiduMapManager.InitMapView();
+		Log.e("story","地图初始化结果为："+b);
 	}
 	/**
 	 * 获取数据库中数据，由于数据库中可能存在很多数据，因此需要开启一个新的线程来获取
@@ -404,8 +459,7 @@ public class FragmentHistory extends Fragment {
 			@Override
 			public void run() {
 				super.run();
-				heavyMentalDataBaseDao = HeavyMentalDataBaseDao.getInstance(mContext,TABLE_NAME);
-				hMDataBaseInfoListAll = heavyMentalDataBaseDao.getAll();
+
 				mHandler.sendEmptyMessage(0);
 			}
 		}.start();
@@ -421,63 +475,62 @@ public class FragmentHistory extends Fragment {
 		dateDialog.show();
 		View view = View.inflate(mContext, R.layout.dialog_date_picker, null);
 		dateDialog.setContentView(view, new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,890));
-		final TextView tv_startdate=(TextView) view.findViewById(R.id.tv_dialog_datepicker_startdate);
-		final TextView tv_enddate=(TextView) view.findViewById(R.id.tv_dialog_datepicker_enddate);
-		final TextView tv_dialog_enddate_warning=(TextView) view.findViewById(R.id.tv_dialog_enddate_warning);
+		final TextView tv_startDate=(TextView) view.findViewById(R.id.tv_dialog_datepicker_startdate);
+		final TextView tv_endDate=(TextView) view.findViewById(R.id.tv_dialog_datepicker_enddate);
+		final TextView tv_dialog_endDate_warning=(TextView) view.findViewById(R.id.tv_dialog_enddate_warning);
 		Button bt_ok=(Button) view.findViewById(R.id.bt_dialog_date_picker_ok);
 		Button bt_cancel=(Button) view.findViewById(R.id.bt_dialog_date_picker_cancel);
 		Button bt_dialog_date_pick_all=(Button) view.findViewById(R.id.bt_dialog_date_pick_all);
 		
-		final DatePicker dp_startdate=(DatePicker) view.findViewById(R.id.dp_dialog_datepicker_startdate);
-		final DatePicker dp_enddate=(DatePicker) view.findViewById(R.id.dp_dialog_datepicker_enddate);		
-		dp_startdate.init(2017, 2, 9, new OnDateChangedListener() {
+		final DatePicker dp_startDate=(DatePicker) view.findViewById(R.id.dp_dialog_datepicker_startdate);
+		final DatePicker dp_endDate=(DatePicker) view.findViewById(R.id.dp_dialog_datepicker_enddate);
+		dp_startDate.init(2017, 2, 9, new OnDateChangedListener() {
+			@Override
+			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+				String month=intFormatHandle(monthOfYear+1);
+				String day=intFormatHandle(dayOfMonth);
+				tv_startDate.setText(year+"年"+month+"月"+day+"日");
+			}
+		});
+		dp_endDate.init(2017, 2, 9, new OnDateChangedListener() {
 			
 			@Override
 			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
 				String month=intFormatHandle(monthOfYear+1);
 				String day=intFormatHandle(dayOfMonth);
-				tv_startdate.setText(year+"年"+month+"月"+day+"日");
+				tv_endDate.setText(year+"年"+month+"月"+day+"日");
+				tv_dialog_endDate_warning.setTextColor(Color.WHITE);
+				tv_dialog_endDate_warning.setText("请选择结束日期");
 			}
 		});
-		dp_enddate.init(2017, 2, 9, new OnDateChangedListener() {
-			
-			@Override
-			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-				String month=intFormatHandle(monthOfYear+1);
-				String day=intFormatHandle(dayOfMonth);
-				tv_enddate.setText(year+"年"+month+"月"+day+"日");
-				tv_dialog_enddate_warning.setTextColor(Color.WHITE);
-				tv_dialog_enddate_warning.setText("请选择结束日期");
-			}
-		});
-		String month=intFormatHandle(dp_startdate.getMonth()+1);
-		String day=intFormatHandle(dp_startdate.getDayOfMonth());
-		tv_startdate.setText(dp_startdate.getYear()+"年"+month+"月"+day+"日");
+		String month=intFormatHandle(dp_startDate.getMonth()+1);
+		String day=intFormatHandle(dp_startDate.getDayOfMonth());
+		tv_startDate.setText(dp_startDate.getYear()+"年"+month+"月"+day+"日");
 		
-		month=intFormatHandle(dp_enddate.getMonth()+1);
-		day=intFormatHandle(dp_enddate.getDayOfMonth());
-		tv_enddate.setText(dp_enddate.getYear()+"年"+month+"月"+day+"日");		
+		month=intFormatHandle(dp_endDate.getMonth()+1);
+		day=intFormatHandle(dp_endDate.getDayOfMonth());
+		tv_endDate.setText(dp_endDate.getYear()+"年"+month+"月"+day+"日");
 		bt_ok.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				String startdate=tv_startdate.getText().toString();
-				String enddate=tv_enddate.getText().toString();
-				startdate=startdate.replaceAll("日","");
-				enddate=enddate.replaceAll("日", "");
-				startdate=startdate.replaceAll("[\u4E00-\u9FA5]", "-");
-				enddate=enddate.replaceAll("[\u4E00-\u9FA5]", "-");
-				if(enddate.compareTo(startdate)>0)
+				String startDate=tv_startDate.getText().toString();
+				String endDate=tv_endDate.getText().toString();
+				startDate=startDate.replaceAll("日","");
+				endDate=endDate.replaceAll("日", "");
+				startDate=startDate.replaceAll("[\u4E00-\u9FA5]", "-");//把中文换成-
+				endDate=endDate.replaceAll("[\u4E00-\u9FA5]", "-");
+				if(endDate.compareTo(startDate)>0)
 				{
 					tv_history_choice_date.setTextSize(9);
-					tv_history_choice_date.setText(startdate+"\n~\n"+enddate);
+					tv_history_choice_date.setText(startDate+"\n~\n"+endDate);
 					mHandler.sendEmptyMessage(0);
 					dateDialog.dismiss();
 				}
 				else 
 				{
-					tv_dialog_enddate_warning.setTextColor(Color.RED);
-					tv_dialog_enddate_warning.setText("结束日期必须大于开始日期");
+					tv_dialog_endDate_warning.setTextColor(Color.RED);
+					tv_dialog_endDate_warning.setText("结束日期必须大于开始日期");
 				}
 			}
 		});
@@ -492,7 +545,6 @@ public class FragmentHistory extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				tv_history_choice_date.setTextSize(14);
 				tv_history_choice_date.setText("全部");
 				mHandler.sendEmptyMessage(0);
@@ -506,45 +558,45 @@ public class FragmentHistory extends Fragment {
 	 * @return 返回响应的字符串，如果整数位1位，则前面补0，如果为两位则直接返回相应的字符串
 	 */
 	private String intFormatHandle(int data) {
-		String datastr=""+data;
-		if(datastr.length()==1) 
+		String dataStr=""+data;
+		if(dataStr.length()==1)
 		{
-			datastr="0"+datastr;
-			return datastr;
+			dataStr="0"+dataStr;
+			return dataStr;
 		}	
-		return datastr;
-		
+		return dataStr;
 	}
 	/**
 	 *  初始化控件的ID
 	 */
 	private void initId() {
-		historyMapView=(MapView)historyView.findViewById(R.id.history_BmapView);
-		sp_history_pollution = (Spinner) historyView.findViewById(R.id.sp_history_choice_pollution);
-		tv_history_choice_date = (TextView) historyView.findViewById(R.id.tv_history_choice_date);
-		sp_history_choice_city=(Spinner)historyView.findViewById(R.id.sp_history_choice_address);
-		lv_history_listview = (ListView) historyView.findViewById(R.id.lv_history_listview);
-		tv_history_time_order = (TextView) historyView.findViewById(R.id.tv_history_time_order);
-		tv_history_pollution_order = (TextView) historyView.findViewById(R.id.tv_history_pollution_order);
+		historyMapView=(MapView)mHistoryView.findViewById(R.id.history_BmapView);
+		sp_history_pollution = (Spinner) mHistoryView.findViewById(R.id.sp_history_choice_pollution);
+		tv_history_choice_date = (TextView) mHistoryView.findViewById(R.id.tv_history_choice_date);
+		sp_history_choice_city=(Spinner)mHistoryView.findViewById(R.id.sp_history_choice_address);
+		lv_history_listView = (ListView) mHistoryView.findViewById(R.id.lv_history_listview);
+		tv_history_time_order = (TextView) mHistoryView.findViewById(R.id.tv_history_time_order);
+		tv_history_pollution_order = (TextView) mHistoryView.findViewById(R.id.tv_history_pollution_order);
 	}
 	
 	/**给城市spinner列表设置数据适配器
 	 * @author story
 	 *
 	 */
-	public class CitiessAdapter extends ArrayAdapter<String>
+	private class CitiesAdapter extends ArrayAdapter<String>
 	{
-		
-		public CitiessAdapter(Context context, int resource, List<String> objects) {
-			super(context, resource, objects);
+		private List<String> citiesList;
+		CitiesAdapter(Context context, int resource, List<String> lists)
+		{
+			super(context, resource, lists);
+			citiesList=lists;
 		}
 		public int getCount() {
-			return citieslist.size();
+			return citiesList==null? 0:citiesList.size();
 		}
-
 		@Override
 		public String getItem(int position) {
-			return citieslist.get(position);
+			return citiesList.get(position);
 		}
 
 		@Override
@@ -553,47 +605,49 @@ public class FragmentHistory extends Fragment {
 		}
 
 		@Override
-		public View getDropDownView(int position, View convertView, ViewGroup parent) {
-			View view = View.inflate(mContext, R.layout.spinner_city_dropdown, null);
-			TextView tv_spinner_city_dropdown=(TextView) view.findViewById(R.id.tv_spinner_city_dropdown);
-			TextView tv_spinner_cityfirst_dropdown=(TextView) view.findViewById(R.id.tv_spinner_cityfirst_dropdown);
-			String city = citieslist.get(position);
+		public View getDropDownView(int position, View convertView, ViewGroup parent)
+		{
+			if(convertView==null)
+			{
+				convertView=View.inflate(mContext, R.layout.spinner_city_dropdown, null);
+			}
+			TextView tv_spinner_city_dropdown=(TextView) convertView.findViewById(R.id.tv_spinner_city_dropdown);
+			TextView tv_spinner_cityFirst_dropdown=(TextView) convertView.findViewById(R.id.tv_spinner_cityfirst_dropdown);
+			String city = citiesList.get(position);
 			String cityFirst = city.substring(0, 1);
 			String cityName = city.substring(1, city.length());
 			tv_spinner_city_dropdown.setText(cityName);
-			tv_spinner_cityfirst_dropdown.setText(cityFirst);
-			return view;
+			tv_spinner_cityFirst_dropdown.setText(cityFirst);
+			return convertView;
 		}
 
-		@SuppressLint("ViewHolder")
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = View.inflate(mContext, R.layout.spinner_text_style, null);
-			TextView tv_spinner_text=(TextView) view.findViewById(R.id.tv_spinner_text);
-			String city = citieslist.get(position);
+			if(convertView==null)
+			{
+				convertView=View.inflate(mContext, R.layout.spinner_text_style, null);
+			}
+			TextView tv_spinner_text=(TextView) convertView.findViewById(R.id.tv_spinner_text);
+			String city = citiesList.get(position);
 			String cityName = city.substring(1, city.length());
 			tv_spinner_text.setText(cityName);
-			return view;
+			return convertView;
 		}
 	}
 	
-	public class MyListViewAdapter extends BaseAdapter {
-
+	private class MyListViewAdapter extends BaseAdapter {
 		@Override
 		public int getCount() {
-			return hMDataBaseInfoList.size();
+			return mHMInfoList==null ? 0 : mHMInfoList.size();
 		}
-
 		@Override
 		public Object getItem(int position) {
-			return hMDataBaseInfoList.get(position);
+			return mHMInfoList.get(position);
 		}
-
 		@Override
 		public long getItemId(int position) {
 			return position;
 		}
-
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
 			if(convertView==null)
@@ -608,29 +662,31 @@ public class FragmentHistory extends Fragment {
 			tv_history_item_details.setVisibility(View.GONE);
 			ImageView iv_history_item_arrow=(ImageView) convertView.findViewById(R.id.iv_history_item_arrow);
 			iv_history_item_arrow.setBackgroundResource(R.drawable.history_item_arrow_detail_down);
-			HMDataBaseInfo hmDataBaseInfo = hMDataBaseInfoList.get(position);
-			tv_history_item_date.setText(hmDataBaseInfo.getDate());
+			HeavyMentalDataInfo hmDataBaseInfo = mHMInfoList.get(position);
+
+			tv_history_item_date.setText(MyUsingUtils.DateToString(hmDataBaseInfo.getCreatetime()));
 			tv_history_item_city.setText(hmDataBaseInfo.getCity());
 			tv_history_item_address.setText(hmDataBaseInfo.getAddress());
-			String pollutionstr = hmDataBaseInfo.getPollution();
-			if(pollutionstr.equals("无污染")) 
+			String pollutionStr = hmDataBaseInfo.getPollution();
+
+			//根据不同的污染情况显示不同的字体颜色
+			if(pollutionStr.equals(MyConstantValue.NO_POLLUTION))
 			{
-				//直接利用数字表示颜色的时候，必须加上透明度的两位数，不然默认为00即全透明。所以一共必须为8位
-				tv_history_item_pollute.setTextColor(0xFF43CD80);
+				tv_history_item_pollute.setTextColor(getResources().getColor(R.color.my_no_pollution));
 			}
-			if(pollutionstr.equals("轻度污染")) 
+			if(pollutionStr.equals(MyConstantValue.SLIGHT_POLLUTION))
 			{
-				tv_history_item_pollute.setTextColor(0xFF8E8E38);
+				tv_history_item_pollute.setTextColor(getResources().getColor(R.color.my_slight_pollution));
 			}
-			if(pollutionstr.equals("中度污染")) 
+			if(pollutionStr.equals(MyConstantValue.MIDDLE_POLLUTION))
 			{
-				tv_history_item_pollute.setTextColor(0xFF8B4726);
+				tv_history_item_pollute.setTextColor(getResources().getColor(R.color.my_middle_pollution));
 			}
-			if(pollutionstr.equals("重度污染")) 
+			if(pollutionStr.equals(MyConstantValue.HIGH_POLLUTION))
 			{
-				tv_history_item_pollute.setTextColor(0xFF8B0000);
+				tv_history_item_pollute.setTextColor(getResources().getColor(R.color.my_high_pollution));
 			}
-			tv_history_item_pollute.setText(pollutionstr);
+			tv_history_item_pollute.setText(pollutionStr);
 			return convertView;
 		}
 

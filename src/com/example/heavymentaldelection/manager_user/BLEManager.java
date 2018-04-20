@@ -125,7 +125,7 @@ public class BLEManager {
         {
             disConnectDevice();
         }
-        BLEService.connect(bleAddress,bleName,mContext,mBluetoothAdapter);
+       BLEService.connect(bleAddress,bleName,mContext,mBluetoothAdapter);
     }
 
     //取消连接
@@ -258,6 +258,10 @@ public class BLEManager {
         });
     }
 
+    public void readBatteryLevel()
+    {
+        BLEService.readBatteryLevel();
+    }
     /**
      * @author story
      *自定义的adapter

@@ -18,6 +18,14 @@
 	        android:drawableStart="@drawable/warning_picture"
 	        android:visibility="gone"
 	    />
+		<ImageView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/iv_main_battery"
+			android:background="@drawable/battery_100_48px"
+			android:layout_marginTop="5dp"
+			android:layout_alignParentEnd="true"
+			/>
         <TextView
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"

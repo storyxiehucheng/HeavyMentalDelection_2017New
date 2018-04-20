@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:background="#C4C4C4"
     android:padding="20dp"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,7 +13,7 @@
         android:background="#FCFCFC"
         android:textSize="20sp"
         android:padding="10dp"
-        android:text="方波脉冲伏安法"
+        android:text="总氮：溶解(第三步)"
         android:id="@+id/bt_SWV"
         />
     <Button
@@ -22,7 +23,7 @@
         android:background="#FCFCFC"
         android:textSize="20sp"
         android:padding="10dp"
-        android:text="差分脉冲伏安法"
+        android:text="总氮：沉积(第一步)"
         android:layout_marginTop="20dp"
         android:id="@+id/bt_DPV"
         />
@@ -33,8 +34,8 @@
         android:background="#FCFCFC"
         android:textSize="20sp"
         android:padding="10dp"
-        android:text="循环伏安法"
+        android:text="总氮：检测(第二步)"
         android:layout_marginTop="20dp"
-        android:id="@+id/bt_CV"
+        android:id="@+id/bt_LSV"
         />
 </LinearLayout>
